@@ -11,8 +11,11 @@ MongoClient.connect("mongodb://localhost:27017",{useUnifiedTopology: true}, func
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Dactilo contest' });
+router.get('/', function(req, res) {
+  db.collection("rooms").find().toArray((error, result) => {
+  console.log(result)
+    res.render('index', { title: 'Dactilo contest', rooms: result });
+  })
 });
 
 router.post('/createRoom',function (req, res) {

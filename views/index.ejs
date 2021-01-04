@@ -23,18 +23,12 @@
         <div class="tab-pane active" id="rejoindre" role="tabpanel" aria-labelledby="home-tab">
             <h3 class="my-3">Liste des salons disponibles</h3>
             <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Le salon de l'amour
-                    <span class="badge bg-primary rounded-pill">14</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Venez nombreux
-                    <span class="badge bg-primary rounded-pill">2</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Le clan des joyeux geeks
-                    <span class="badge bg-primary rounded-pill">1</span>
-                </li>
+                <% for(let i = 0; i < rooms.length; i++){ %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= rooms[i].titre %>
+                        <span class="badge bg-primary rounded-pill"><%= rooms.length %></span>
+                    </li>
+                <% } %>
             </ul>
         </div>
         <div class="tab-pane" id="creation" role="tabpanel" aria-labelledby="profile-tab">
@@ -64,7 +58,6 @@
 <script src="/javascripts/index.js"></script>
 <script>
     var socket = io.connect("localhost:3000");
-
 </script>
 
 <%- include('footer'); -%>
