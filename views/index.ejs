@@ -1,0 +1,61 @@
+<%- include('header'); -%>
+<div class="container">
+    <h1><%= title %></h1>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#rejoindre"
+               role="tab" aria-controls="rejoindre" aria-selected="true">
+                Rejoindre un salon
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#creation"
+               role="tab" aria-controls="creation" aria-selected="false">
+                Créer un salon
+            </a>
+        </li>
+    </ul>
+
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="rejoindre" role="tabpanel" aria-labelledby="home-tab">
+            <h3 class="my-3">Liste des salons disponibles</h3>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Le salon de l'amour
+                    <span class="badge bg-primary rounded-pill">14</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Venez nombreux
+                    <span class="badge bg-primary rounded-pill">2</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Le clan des joyeux geeks
+                    <span class="badge bg-primary rounded-pill">1</span>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-pane" id="creation" role="tabpanel" aria-labelledby="profile-tab">
+            <form class="col-6 mt-3 mx-auto" action="">
+                <div class="mb-3">
+                    <label for="titre" class="form-label">Titre</label>
+                    <input class="form-control" type="text" placeholder="Précisez le titre du salon" id="titre"
+                           name="titre">
+                </div>
+                <div class="mb-3">
+                    <label for="titre" class="form-label">Votre pseudo</label>
+                    <input class="form-control" type="text" placeholder="Votre nom visible par les autres joueurs"
+                           id="titre" name="titre">
+                </div>
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <input type="submit" value="GO" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<%- include('footer'); -%>
