@@ -5,11 +5,11 @@
     #wrapper {
         display: grid;
         grid-gap: 10px;
-        grid-template-areas: "t t t"
+        grid-template-areas: "t t ti"
                        "p g g"
                        "b b b";
         grid-template-rows: 50px 500px 50px;
-        grid-template-columns: 10% 90%;
+        grid-template-columns: 10% 80% 10%;
         height: 80vh;
     }
 
@@ -66,11 +66,25 @@
     .player-list li:nth-child(2n) {
         background-color: lightgrey;
     }
+    .timer{
+        grid-area: ti;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        font-weight: bold;
+    }
 </style>
 
 <div id="wrapper">
     <div class="titre">
-        <h1 class="text-center"><%= room.titre %></h1>
+        <h1 class="text-center"></h1>
+    </div>
+    <div class="timer">
+        <span class="minutes">00</span>
+        <span>:</span>
+        <span class="seconds">00</span>
     </div>
     <div class="players">
         <ul class="player-list">

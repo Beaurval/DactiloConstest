@@ -45,71 +45,67 @@ async function getWordList() {
     return await db.collection("words").aggregate([{$sample: {size: 10}}]).toArray();
 }
 
+
 /* GET home page. */
 router.get('/', function (req, res) {
     let myQuery = {titre: req.query.roomName}
-    db.collection("rooms").findOne(myQuery, (error, result) => {
-        if (error) throw error;
-        res.render('partie', {title: 'Salle d\'attente', room: result});
-    })
+
+    res.render('partie', {title: 'Dactilo Contest'});
 });
-router.get('/salonExist/:name', function (req, res) {
-
-    let myQuery = {titre: req.params.name}
-
-    db.collection("rooms").findOne(myQuery, (error, result) => {
-        if (error) throw error;
-        if (result) {
-            res.send(true);
-        } else
-            res.send(false);
-    });
-})
-
 
 
 
 module.exports = {
     router,
     start: function (io) {
-            io.on('connection', function (socket) {
-                socket.on('setPseudo', function (pseudo) {
-                    socket.pseudo = pseudo;
+        function getSocketWhithId(id) {
+            var ns = io.of("/");
+            return ns.sockets.get(id);
+        }
+
+        function recupererListeJoueurDuSalon(titre) {
+            let players = [];
+            try {
+                var clients = io.sockets.adapter["rooms"].get(titre);
+                clients.forEach(elem => {
+                    players.push(getSocketWhithId(elem).pseudo);
                 })
+            } catch (e) {
 
-                socket.on('nouveauSalon', function (titre, pseudo) {
+            }
+
+            return players;
+        }
+
+        io.on('connection', function (socket) {
+            socket.on('setPseudo', function (pseudo) {
+                socket.pseudo = pseudo;
+            })
+
+            socket.on('rejoindreSalon', async function (titre) {
+                if(recupererListeJoueurDuSalon(titre).length === 0){
                     socket.join(titre);
-                    var nouveauSalon = {titre: titre, admin: pseudo};
-
-
-                    db.collection("rooms").insertOne(nouveauSalon, null, function (error, results) {
-                        if (error) throw error;
-
-                        ajouterJoueur(pseudo, titre);
-                    });
-
-
-                });
-
-                socket.on('rejoindreSalon', async function (titre) {
+                    console.log(recupererListeJoueurDuSalon(titre));
+                }
+                if (!recupererListeJoueurDuSalon(titre).includes(socket.pseudo)) {
                     socket.join(titre);
                     socket.salon = titre;
+                }
 
-                    await ajouterJoueur(socket.pseudo, titre)
-                    let players = await joueursDansSalon(titre);
-                    socket.emit('afficherJoueurs', players);
-                });
 
-                socket.on('commencerPartie', function (salon) {
-                    getWordList().then(wordList => {
-                        io.emit('initialiserListeDeMots', wordList);
-                    })
-
-                })
-
-                socket.on('disconnect', function (reason) {
-                    supprimerJoueur(socket.pseudo, socket.salon);
-                })
+                socket.emit('afficherJoueurs', recupererListeJoueurDuSalon(titre));
             });
+
+            socket.on('commencerPartie', function (salon) {
+                getWordList().then(wordList => {
+                    io.emit('initialiserListeDeMots', wordList);
+                })
+
+            })
+
+            socket.on('disconnect', function (reason) {
+                console.log("Salon quitté")
+            })
+        });
     }
 };

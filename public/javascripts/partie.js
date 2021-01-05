@@ -5,32 +5,18 @@ const titre = urlParams.get("roomName");
 
 let words = [];
 let nbMotsValides = 0;
+let chronoCanInc = false;
 
 function definirPseudo() {
-    socket.emit('setPseudo',urlParams.get("pseudo"));
+    socket.emit('setPseudo', urlParams.get("pseudo"));
 }
 
-function ajouterSalon(){
-
-
-    salonExist(titre).then(exist => {
-        if(!exist && titre !== "" && pseudo !== ""){
-            alert("Ajout du nouveau salon")
-            socket.emit('nouveauSalon', titre,pseudo);
-        }else {
-            socket.emit('rejoindreSalon',titre);
-        }
-    });
-}
-
-async function salonExist(roomName) {
-    return await $.get({
-        url: "/partie/salonExist/" + roomName
-    });
+function rejoindreSalon() {
+    socket.emit('rejoindreSalon', titre, pseudo);
 }
 
 async function getWordsList() {
-    return await  $.get({
+    return await $.get({
         url: "/partie/getWordList"
     });
 }
@@ -38,10 +24,10 @@ async function getWordsList() {
 /* FONCTIONS DU JEU */
 async function commencerPartie(btn) {
     $(btn).hide();
-    socket.emit('commencerPartie',titre)
+    socket.emit('commencerPartie', titre)
 }
 
-function changerDeMot(word){
+function changerDeMot(word) {
     $(".game").html(word)
 }
 
@@ -53,10 +39,10 @@ $("#typing-bar").keypress(function (e) {
 })
 
 
-socket.on('initialiserListeDeMots',wordList => {
-    alert("coucou")
+socket.on('initialiserListeDeMots', wordList => {
     words = wordList;
     changerDeMot(words[0].Word);
+    startChrono(true);
 });
 
 socket.on('changerMot', word => {
@@ -65,18 +51,50 @@ socket.on('changerMot', word => {
 
 /* FONCTIONS DU JEU */
 
-function init(){
+function init() {
     definirPseudo()
-    ajouterSalon()
+    rejoindreSalon()
 }
 
-socket.on('afficherJoueurs',(players) => {
-    for (let i =0; i < players.length; i++){
-        $(".player-list").append("<li>" + players[i].pseudo + "</li>")
+function incMinutes() {
+    let $min = $(".minutes");
+    let minutes = parseInt($min.text());
+    minutes++;
+    $min.text((minutes < 10 ? "0" : "") + minutes);
+}
+
+function startChrono(start) {
+    if (start)
+        chronoCanInc = true;
+    $sec = $(".seconds");
+    let secondes = parseInt($sec.text());
+    if (secondes < 60) {
+        secondes++
+        $sec.text((secondes < 10 ? "0" : "") + secondes);
+    } else {
+        incMinutes();
+        secondes = 0;
+        $sec.text("00");
+    }
+
+
+    if (chronoCanInc) {
+        setTimeout(startChrono, 1000)
+    }
+}
+
+function stopChrono() {
+    chronoCanInc = false;
+}
+
+
+socket.on('afficherJoueurs', (players) => {
+    for (let i = 0; i < players.length; i++) {
+        $(".player-list").append("<li>" + players[i] + "</li>")
     }
 
 })
 
-$(()=>{
+$(() => {
     init();
 })
