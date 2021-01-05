@@ -1,12 +1,17 @@
 const urlParams = new URLSearchParams(window.location.search);
+const MAXWORDS = 10;
+const pseudo = urlParams.get("pseudo");
+const titre = urlParams.get("roomName");
+
+let words = [];
+let nbMotsValides = 0;
 
 function definirPseudo() {
     socket.emit('setPseudo',urlParams.get("pseudo"));
 }
 
 function ajouterSalon(){
-    let pseudo = urlParams.get("pseudo");
-    let titre = urlParams.get("roomName");
+
 
     salonExist(titre).then(exist => {
         if(!exist && titre !== "" && pseudo !== ""){
@@ -24,6 +29,41 @@ async function salonExist(roomName) {
     });
 }
 
+async function getWordsList() {
+    return await  $.get({
+        url: "/partie/getWordList"
+    });
+}
+
+/* FONCTIONS DU JEU */
+async function commencerPartie(btn) {
+    $(btn).hide();
+    socket.emit('commencerPartie',titre)
+}
+
+function changerDeMot(word){
+    $(".game").html(word)
+}
+
+$("#typing-bar").keypress(function (e) {
+    if (e.keyCode === 13) {
+        //TODO VALIDATION DU MOT COTE SERVEUR
+        socket.emit('reponse')
+    }
+})
+
+
+socket.on('initialiserListeDeMots',wordList => {
+    alert("coucou")
+    words = wordList;
+    changerDeMot(words[0].Word);
+});
+
+socket.on('changerMot', word => {
+    changerDeMot(word);
+})
+
+/* FONCTIONS DU JEU */
 
 function init(){
     definirPseudo()

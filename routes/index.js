@@ -1,6 +1,6 @@
 var app = require('express');
 var router = app.Router();
-var io = require('../io').io();
+
 var MongoClient = require("mongodb").MongoClient;
 var db = null;
 

@@ -30,58 +30,66 @@
     .players {
         grid-area: p;
         background-color: white;
+        position: relative;
+    }
+
+    .players button {
+        width: 100%;
+        height: 35px;
+        position: absolute;
+        bottom: 0;
     }
 
     .typing-bar {
         grid-area: b;
         background-color: white;
     }
-    .typing-bar input{
+
+    .typing-bar input {
         width: 100%;
         height: 100%;
         font-size: 2em;
     }
 
 
-    .player-list{
+    .player-list {
         list-style: none;
         padding: 0;
     }
-    .player-list li{
+
+    .player-list li {
         width: 100%;
         text-align: center;
         padding: 10px;
     }
-    .player-list li:nth-child(2n){
+
+    .player-list li:nth-child(2n) {
         background-color: lightgrey;
     }
 </style>
 
 <div id="wrapper">
     <div class="titre">
-        <h1 class="text-center">Titre de la salle</h1>
+        <h1 class="text-center"><%= room.titre %></h1>
     </div>
     <div class="players">
         <ul class="player-list">
             <li>Joueurs dans le salon :</li>
         </ul>
+        <button onclick="commencerPartie(this)" class="btn btn-outline-info mb-1">Commencer la partie</button>
     </div>
     <div class="game">
-        COCHON
+        EN ATTENTE DES AUTRES JOUEURS ...
     </div>
     <div class="typing-bar">
-        <input type="text">
+        <input id="typing-bar" type="text">
     </div>
 </div>
 
 <script src="/js/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io({
-        query: {
-            token: "69tmU8ewWb2eGcOTAAAR"
-        }
-    });
+    var socket = io();
 </script>
 <script src="/javascripts/partie.js"></script>
 <%- include('footer'); -%>
