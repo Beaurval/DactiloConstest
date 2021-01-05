@@ -2,6 +2,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const MAXWORDS = 10;
 const pseudo = urlParams.get("pseudo");
 const titre = urlParams.get("roomName");
+const isAdmin = urlParams.get("isAdmin");
 
 let words = [];
 let nbMotsValides = 0;
@@ -12,7 +13,7 @@ function definirPseudo() {
 }
 
 function rejoindreSalon() {
-    socket.emit('rejoindreSalon', titre, pseudo);
+    socket.emit('rejoindreSalon', titre,isAdmin);
 }
 
 async function getWordsList() {

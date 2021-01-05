@@ -48,9 +48,7 @@ async function getWordList() {
 
 /* GET home page. */
 router.get('/', function (req, res) {
-    let myQuery = {titre: req.query.roomName}
-
-    res.render('partie', {title: 'Dactilo Contest'});
+    res.render('partie', {title: 'Dactilo Contest',isAdmin: req.query.isAdmin});
 });
 
 
@@ -82,17 +80,20 @@ module.exports = {
                 socket.pseudo = pseudo;
             })
 
-            socket.on('rejoindreSalon', async function (titre) {
+            socket.on('rejoindreSalon', async function (titre,isAdmin) {
                 if(recupererListeJoueurDuSalon(titre).length === 0){
                     socket.join(titre);
+                    if(isAdmin){
+                        socket.isAdmin = true;
+                    }else{
+                        socket.isAdmin = false;
+                    }
                     console.log(recupererListeJoueurDuSalon(titre));
                 }
                 if (!recupererListeJoueurDuSalon(titre).includes(socket.pseudo)) {
                     socket.join(titre);
                     socket.salon = titre;
                 }
-
-
                 socket.emit('afficherJoueurs', recupererListeJoueurDuSalon(titre));
             });
 

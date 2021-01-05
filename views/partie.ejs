@@ -66,7 +66,8 @@
     .player-list li:nth-child(2n) {
         background-color: lightgrey;
     }
-    .timer{
+
+    .timer {
         grid-area: ti;
         background-color: white;
         display: flex;
@@ -90,7 +91,10 @@
         <ul class="player-list">
             <li>Joueurs dans le salon :</li>
         </ul>
-        <button onclick="commencerPartie(this)" class="btn btn-outline-info mb-1">Commencer la partie</button>
+        <%
+        if(isAdmin == "true"){ %>
+            <button onclick="commencerPartie(this)" class="btn btn-outline-info mb-1">Commencer la partie</button>
+        <% } %>
     </div>
     <div class="game">
         EN ATTENTE DES AUTRES JOUEURS ...
