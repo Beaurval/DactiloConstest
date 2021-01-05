@@ -3,14 +3,12 @@
 //Socket IO
 function ajouterSalon(){
     let pseudo = $("#pseudo").val();
-    let titre = $("#titre").val();
+    let titre = $("#roomName").val();
 
-    alert("0k")
     if(titre !== "" && pseudo !== "") {
-        socket.emit('nouveauSalon', "Salon de thé","Superman")
+        socket.emit('nouveauSalon', titre,pseudo)
     }
     else{
         alert("Veuillez remplir tous les champs !")
     }
-
 }
