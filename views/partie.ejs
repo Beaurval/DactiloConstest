@@ -1,0 +1,87 @@
+<%- include('header'); -%>
+
+<h1><%= title %></h1>
+<style>
+    #wrapper {
+        display: grid;
+        grid-gap: 10px;
+        grid-template-areas: "t t t"
+                       "p g g"
+                       "b b b";
+        grid-template-rows: 50px 500px 50px;
+        grid-template-columns: 10% 90%;
+        height: 80vh;
+    }
+
+    .titre {
+        grid-area: t;
+        background-color: white;
+    }
+
+    .game {
+        grid-area: g;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5em;
+    }
+
+    .players {
+        grid-area: p;
+        background-color: white;
+    }
+
+    .typing-bar {
+        grid-area: b;
+        background-color: white;
+    }
+    .typing-bar input{
+        width: 100%;
+        height: 100%;
+        font-size: 2em;
+    }
+
+
+    .player-list{
+        list-style: none;
+        padding: 0;
+    }
+    .player-list li{
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
+    .player-list li:nth-child(2n){
+        background-color: lightgrey;
+    }
+</style>
+
+<div id="wrapper">
+    <div class="titre">
+        <h1 class="text-center">Titre de la salle</h1>
+    </div>
+    <div class="players">
+        <ul class="player-list">
+            <li>Joueurs dans le salon :</li>
+        </ul>
+    </div>
+    <div class="game">
+        COCHON
+    </div>
+    <div class="typing-bar">
+        <input type="text">
+    </div>
+</div>
+
+<script src="/js/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io({
+        query: {
+            token: "69tmU8ewWb2eGcOTAAAR"
+        }
+    });
+</script>
+<script src="/javascripts/partie.js"></script>
+<%- include('footer'); -%>
