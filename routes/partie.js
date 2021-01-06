@@ -64,7 +64,6 @@ module.exports = {
 
 
         io.on('connection', function (socket) {
-            console.log(rooms)
             socket.on('setPseudo', function (pseudo) {
                 socket.pseudo = pseudo;
             })
@@ -79,14 +78,16 @@ module.exports = {
                         players: [socket.pseudo],
                         admin: socket.pseudo,
                         start: null,
-                        gameStarted: false
+                        gameStarted: false,
+                        wordList: [],
+                        scores: []
                     }
                 } else {
                     let room = rooms[titre];
                     socket.join(titre);
                     socket.salon = titre;
                     socket.isAdmin = isAdmin;
-                    if(!room.players.includes(socket.pseudo)){
+                    if (!room.players.includes(socket.pseudo)) {
                         room.players.push(socket.pseudo);
                     }
                 }
@@ -96,8 +97,60 @@ module.exports = {
             socket.on('commencerPartie', function (salon) {
                 getWordList().then(wordList => {
                     let room = rooms[salon];
-                    io.to(salon).emit('initialiserListeDeMots', wordList);
+                    room.gameStarted = true;
+                    room.start = new Date();
+                    room.wordList = wordList;
+
+                    for (let i =0; i < room.players.length; i++){
+                        room.scores[room.players[i]] = [];
+                    }
+
+                    io.to(salon).emit('premierMot');
                 });
+            });
+
+            socket.on('demanderMot',(salon,index) => {
+                let room = rooms[salon];
+                let word;
+                if (index === 0){
+                    word = room.wordList[index].Word;
+                }
+                else
+                    word = room.wordList[room.scores[socket.pseudo].length].word;
+
+                room.scores[socket.pseudo].push({
+                   word: word,
+                   givenAt: new Date(),
+                   completedAt: null
+                });
+
+                socket.emit('afficherMot',word);
+            });
+
+            socket.on('saisieMot', function (salon, saisieJoueur) {
+                let room = rooms[salon];
+                let scoreDuJoueur = room.scores[socket.pseudo];
+                let currentWord = room.wordList[scoreDuJoueur.length - 1].Word;
+
+                if (currentWord.toLowerCase() === saisieJoueur.toLowerCase()) {
+                    scoreDuJoueur[scoreDuJoueur.length -1].completedAt = new Date();
+                    console.log(scoreDuJoueur);
+
+                    //On ajoute le mot suivant
+                    let nextWord = room.wordList[scoreDuJoueur.length].Word;
+                    room.scores[socket.pseudo].push({
+                        word: nextWord,
+                        givenAt: new Date(),
+                        completedAt: null
+                    });
+                    socket.emit('afficherMot',nextWord);
+                    socket.emit('resetSaisie');
+                } else {
+                    console.log("Saisie erronnée")
+                    socket.emit('resetSaisie');
+                }
+
+
             })
 
             socket.on('disconnect', function (reason) {
@@ -107,7 +160,7 @@ module.exports = {
                     if (room.admin === socket.pseudo) {
                         const index = rooms.indexOf(titre);
                         rooms.splice(index, 1)
-                    }else{
+                    } else {
                         const index = room.players.indexOf(socket.pseudo);
                         room.players.splice(index, 1)
                     }

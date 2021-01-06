@@ -4,7 +4,6 @@ const pseudo = urlParams.get("pseudo");
 const titre = urlParams.get("roomName");
 const isAdmin = urlParams.get("isAdmin");
 
-let words = [];
 let nbMotsValides = 0;
 let chronoCanInc = false;
 
@@ -35,18 +34,25 @@ function changerDeMot(word) {
 $("#typing-bar").keypress(function (e) {
     if (e.keyCode === 13) {
         //TODO VALIDATION DU MOT COTE SERVEUR
-        socket.emit('reponse')
+        socket.emit('saisieMot',titre,$(this).val());
     }
 })
 
+socket.on('resetSaisie',()=>{
+   $("#typing-bar").val("");
+});
 
-socket.on('initialiserListeDeMots', wordList => {
-    words = wordList;
-    changerDeMot(words[0].Word);
+socket.on('nouveauMot', word => {
+    changerDeMot(word);
     startChrono(true);
 });
 
-socket.on('changerMot', word => {
+
+socket.on('premierMot', ()=>{
+   socket.emit('demanderMot',titre,0);
+});
+
+socket.on('afficherMot', word => {
     changerDeMot(word);
 })
 
