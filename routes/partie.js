@@ -89,8 +89,7 @@ module.exports = {
                         wordList: [],
                         scores: [],
                         maxwords: 3,
-                        progression: [],
-                        playerFinished: []
+                        playerFinished: [],
                     }
 
                 } else {
@@ -119,6 +118,7 @@ module.exports = {
                         room.scores[room.players[i]] = [];
                     }
                     io.to(salon).emit('afficherJoueurs', room.players)
+                    io.to(salon).emit('afficherProgression',room.players,0)
                     io.to(salon).emit('premierMot');
                 });
             });
@@ -152,7 +152,7 @@ module.exports = {
                     let completedTime = new Date();
                     scoreDuJoueur[scoreDuJoueur.length - 1].completedAt = completedTime;
 
-                    io.in(salon).emit('afficherProgression', socket.pseudo, scoreDuJoueur.length )
+                    io.in(salon).emit('afficherProgression', [socket.pseudo], scoreDuJoueur.length )
 
                     //On ajoute le mot suivant
                     if (scoreDuJoueur.length < room.maxwords) {
@@ -178,6 +178,7 @@ module.exports = {
                         //Partie terminée
                         if (room.playerFinished.length === room.players.length) {
                             let bestTime;
+                            let lastsWords = [];
                             for (var key in room.scores) {
                                 var obj = room.scores;
 
@@ -186,16 +187,18 @@ module.exports = {
                                         if (bestTime != null) {
                                             if (bestTime.completedAt > obj[key][i].completedAt) {
                                                 bestTime = obj[key][i];
+                                                bestTime.totalTime = diffSecondes(room.start, bestTime.completedAt);
                                             }
                                         } else {
                                             bestTime = obj[key][i];
                                         }
+                                        obj[key][i].totalTime = diffSecondes(room.start, obj[key][i].completedAt);
+                                        lastsWords.push(obj[key][i]);
                                     }
                                 }
                             }
-                            console.log(bestTime);
-                            bestTime.totalTime = diffSecondes(room.start, bestTime.completedAt);
-                            io.in(salon).emit('partieTerminee',bestTime);
+
+                            io.in(salon).emit('partieTerminee',bestTime,lastsWords);
                         }
 
                     }
@@ -215,6 +218,7 @@ module.exports = {
                     } else {
                         const index = room.players.indexOf(socket.pseudo);
                         room.players.splice(index, 1)
+                        io.to(socket.salon).emit('afficherJoueurs',room.players);
                     }
                 }
             })

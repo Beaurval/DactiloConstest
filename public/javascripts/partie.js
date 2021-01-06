@@ -98,17 +98,32 @@ socket.on('afficherScoreDuJoueur',(totalSecond,joueur) => {
     $("." + joueur).text(" " + totalSecond + "s");
 });
 
-socket.on('partieTerminee',(winner)=> {
-    $(".game").html(
-        winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s"
-    )
+socket.on('afficherProgression',(players,progression) => {
+    players.forEach(player => {
+        $("." + player).text(" " + progression + "/" + MAXWORDS)
+    })
+
+});
+
+socket.on('partieTerminee',(winner,lastWords)=> {
+    let $partieContainer = $(".game");
+    $partieContainer.html(
+        "<span>" + winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s" + "</span>"
+    );
+    lastWords.sort((a,b)=>{
+        if (a.totalTime < b.totalTime) { return -1; }
+        if (a.totalTime > b.totalTime) { return 1; }
+        return 0;
+    });
+    lastWords.forEach(lastWord => {
+        $partieContainer.append("<span style='font-size: 0.6em'>" + lastWord.pseudo + " : " + lastWord.totalTime + "s</span>");
+    })
+
 
     $("#startGame").show();
 });
 
-socket.on('afficherProgression',(player,progression) => {
-    $("." + player).text(" " + progression + "/" + MAXWORDS)
-})
+
 
 socket.on('afficherJoueurs', (players) => {
     let $playersContainer = $(".player-list");
