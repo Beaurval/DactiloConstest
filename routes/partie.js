@@ -4,6 +4,8 @@ var router = app.Router();
 var MongoClient = require("mongodb").MongoClient;
 var db = null;
 
+let rooms = [];
+
 
 MongoClient.connect("mongodb://localhost:27017", {useUnifiedTopology: true}, function (err, client) {
     db = client.db("dactilocontest");
@@ -48,9 +50,8 @@ async function getWordList() {
 
 /* GET home page. */
 router.get('/', function (req, res) {
-    res.render('partie', {title: 'Dactilo Contest',isAdmin: req.query.isAdmin});
+    res.render('partie', {title: 'Dactilo Contest', isAdmin: req.query.isAdmin});
 });
-
 
 
 module.exports = {
@@ -61,51 +62,56 @@ module.exports = {
             return ns.sockets.get(id);
         }
 
-        function recupererListeJoueurDuSalon(titre) {
-            let players = [];
-            try {
-                var clients = io.sockets.adapter["rooms"].get(titre);
-                clients.forEach(elem => {
-                    players.push(getSocketWhithId(elem).pseudo);
-                })
-            } catch (e) {
-
-            }
-
-            return players;
-        }
 
         io.on('connection', function (socket) {
+            console.log(rooms)
             socket.on('setPseudo', function (pseudo) {
                 socket.pseudo = pseudo;
             })
 
-            socket.on('rejoindreSalon', async function (titre,isAdmin) {
-                if(recupererListeJoueurDuSalon(titre).length === 0){
+            socket.on('rejoindreSalon', function (titre, isAdmin) {
+                if (rooms[titre] == null) {
                     socket.join(titre);
-                    if(isAdmin){
-                        socket.isAdmin = true;
-                    }else{
-                        socket.isAdmin = false;
+                    socket.isAdmin = !!isAdmin;
+
+                    rooms[titre] = {
+                        name: titre,
+                        players: [socket.pseudo],
+                        admin: socket.pseudo,
+                        start: null,
+                        gameStarted: false
                     }
-                    console.log(recupererListeJoueurDuSalon(titre));
-                }
-                if (!recupererListeJoueurDuSalon(titre).includes(socket.pseudo)) {
+                } else {
+                    let room = rooms[titre];
                     socket.join(titre);
                     socket.salon = titre;
+                    socket.isAdmin = isAdmin;
+                    if(!room.players.includes(socket.pseudo)){
+                        room.players.push(socket.pseudo);
+                    }
                 }
-                socket.emit('afficherJoueurs', recupererListeJoueurDuSalon(titre));
+                io.to(titre).emit('afficherJoueurs', rooms[titre].players);
             });
 
             socket.on('commencerPartie', function (salon) {
                 getWordList().then(wordList => {
-                    io.emit('initialiserListeDeMots', wordList);
-                })
-
+                    let room = rooms[salon];
+                    io.to(salon).emit('initialiserListeDeMots', wordList);
+                });
             })
 
             socket.on('disconnect', function (reason) {
-                console.log("Salon quitté")
+                let titre = socket.salon;
+                let room = rooms[titre];
+                if (room != null) {
+                    if (room.admin === socket.pseudo) {
+                        const index = rooms.indexOf(titre);
+                        rooms.splice(index, 1)
+                    }else{
+                        const index = room.players.indexOf(socket.pseudo);
+                        room.players.splice(index, 1)
+                    }
+                }
             })
         });
     }

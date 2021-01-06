@@ -90,8 +90,11 @@ function stopChrono() {
 
 
 socket.on('afficherJoueurs', (players) => {
+    $players = $(".player-list");
+    $players.empty();
+    $players.append("<li>Joueurs dans le salon :</li>")
     for (let i = 0; i < players.length; i++) {
-        $(".player-list").append("<li>" + players[i] + "</li>")
+        $players.append("<li>" + players[i] + "</li>")
     }
 
 })
