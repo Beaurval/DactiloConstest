@@ -66,8 +66,12 @@ function incMinutes() {
 }
 
 function startChrono(start) {
-    if (start)
+    if (start){
         chronoCanInc = true;
+        $(".minutes").text("00");
+        $(".seconds").text("00");
+    }
+
     $sec = $(".seconds");
     let secondes = parseInt($sec.text());
     if (secondes < 60) {
