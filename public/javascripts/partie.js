@@ -1,5 +1,5 @@
 const urlParams = new URLSearchParams(window.location.search);
-const MAXWORDS = 10;
+const MAXWORDS = 3;
 const pseudo = urlParams.get("pseudo");
 const titre = urlParams.get("roomName");
 const isAdmin = urlParams.get("isAdmin");
@@ -96,6 +96,12 @@ socket.on('terminerPartieJoueur', (totalSecond) => {
 
 socket.on('afficherScoreDuJoueur',(totalSecond,joueur) => {
     $("." + joueur).text(" " + totalSecond + "s");
+});
+
+socket.on('partieTerminee',(winner)=> {
+    $(".game").html(
+        winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s"
+    )
 });
 
 socket.on('afficherJoueurs', (players, progression) => {
