@@ -112,11 +112,13 @@ module.exports = {
                     room.gameStarted = true;
                     room.start = new Date();
                     room.wordList = wordList;
+                    room.scores = [];
+                    room.playerFinished = [];
 
                     for (let i = 0; i < room.players.length; i++) {
                         room.scores[room.players[i]] = [];
                     }
-
+                    io.to(salon).emit('afficherJoueurs', room.players)
                     io.to(salon).emit('premierMot');
                 });
             });
@@ -150,11 +152,7 @@ module.exports = {
                     let completedTime = new Date();
                     scoreDuJoueur[scoreDuJoueur.length - 1].completedAt = completedTime;
 
-                    room.progression.push({
-                        name: socket.pseudo,
-                        word: currentWord
-                    })
-                    io.in(salon).emit('afficherJoueurs', room.players, room.progression)
+                    io.in(salon).emit('afficherProgression', socket.pseudo, scoreDuJoueur.length )
 
                     //On ajoute le mot suivant
                     if (scoreDuJoueur.length < room.maxwords) {

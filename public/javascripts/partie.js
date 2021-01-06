@@ -102,31 +102,27 @@ socket.on('partieTerminee',(winner)=> {
     $(".game").html(
         winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s"
     )
+
+    $("#startGame").show();
 });
 
-socket.on('afficherJoueurs', (players, progression) => {
-    let $players = $(".player-list");
-    $players.empty();
-    $players.append("<li>Joueurs dans le salon :</li>")
-    for (let i = 0; i < players.length; i++) {
-        $players.append("<li>" + players[i] + "<strong class='" + players[i] + "'></strong></li>")
-    }
-    if (progression != null) {
-        let scores = [];
-        progression.forEach(elem => {
-            scores[elem.name] = {
-                score: 0,
-                name: elem.name
-            };
-        });
-        progression.forEach(elem => {
-            scores[elem.name].score++;
-        });
+socket.on('afficherProgression',(player,progression) => {
+    $("." + player).text(" " + progression + "/" + MAXWORDS)
+})
 
+socket.on('afficherJoueurs', (players) => {
+    let $playersContainer = $(".player-list");
+
+    console.log(players)
+    //Need refresh ?
+    if(players.length !== $(".player-list li").length - 1){
+        $playersContainer.empty();
+        $playersContainer.append("<li>Joueurs dans le salon</li>")
         players.forEach(player => {
-            $("." + player).text(" " + scores[player].score + "/" + MAXWORDS)
-        })
+            $playersContainer.append("<li>" + player + "<strong class='" + player + "'></strong></li>")
+        });
     }
+
 
 })
 
