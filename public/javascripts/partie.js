@@ -89,6 +89,14 @@ function stopChrono() {
     chronoCanInc = false;
 }
 
+socket.on('terminerPartieJoueur', (totalSecond) => {
+    stopChrono();
+    $(".game").text("Vous avez terminé en " + totalSecond + " secondes");
+});
+
+socket.on('afficherScoreDuJoueur',(totalSecond,joueur) => {
+    $("." + joueur).text(" " + totalSecond + "s");
+});
 
 socket.on('afficherJoueurs', (players, progression) => {
     let $players = $(".player-list");
@@ -97,10 +105,10 @@ socket.on('afficherJoueurs', (players, progression) => {
     for (let i = 0; i < players.length; i++) {
         $players.append("<li>" + players[i] + "<strong class='" + players[i] + "'></strong></li>")
     }
-    if(progression != null){
+    if (progression != null) {
         let scores = [];
         progression.forEach(elem => {
-            scores[elem.name]  = {
+            scores[elem.name] = {
                 score: 0,
                 name: elem.name
             };
@@ -109,9 +117,9 @@ socket.on('afficherJoueurs', (players, progression) => {
             scores[elem.name].score++;
         });
 
-       players.forEach(player => {
-           $("." + player).text(" " + scores[player].score + "/" + MAXWORDS)
-       })
+        players.forEach(player => {
+            $("." + player).text(" " + scores[player].score + "/" + MAXWORDS)
+        })
     }
 
 })

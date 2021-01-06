@@ -11,6 +11,13 @@ MongoClient.connect("mongodb://localhost:27017", {useUnifiedTopology: true}, fun
     db = client.db("dactilocontest");
 });
 
+function diffSecondes(t1,t2){
+    var dif = t1.getTime() - t2.getTime();
+
+    var Seconds_from_T1_to_T2 = dif / 1000;
+    return Math.abs(Seconds_from_T1_to_T2);
+}
+
 async function playerExist(pseudo, salon) {
     return !!(await db.collection("players").findOne({pseudo: pseudo, salon: salon}));
 }
@@ -137,14 +144,15 @@ module.exports = {
                 let currentWord = room.wordList[scoreDuJoueur.length - 1].Word;
 
                 if (currentWord.toLowerCase() === saisieJoueur.toLowerCase()) {
-                    scoreDuJoueur[scoreDuJoueur.length - 1].completedAt = new Date();
+                    let completedTime = new Date();
+                    scoreDuJoueur[scoreDuJoueur.length - 1].completedAt = completedTime;
                     console.log(scoreDuJoueur);
 
                     room.progression.push({
                         name: socket.pseudo,
                         word: currentWord
                     })
-                    socket.emit('afficherJoueurs', room.players, room.progression)
+                    io.in(salon).emit('afficherJoueurs', room.players, room.progression)
 
                     //On ajoute le mot suivant
                     if (scoreDuJoueur.length < room.maxwords) {
@@ -157,7 +165,10 @@ module.exports = {
 
                         socket.emit('afficherMot', nextWord);
                     } else {
+                        let totalSeconds = diffSecondes(room.start,completedTime);
 
+                        socket.emit('terminerPartieJoueur',totalSeconds);
+                        io.in(salon).emit('afficherScoreDuJoueur',totalSeconds,socket.pseudo);
                     }
                     socket.emit('resetSaisie');
                 } else {
