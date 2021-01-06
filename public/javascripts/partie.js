@@ -12,13 +12,7 @@ function definirPseudo() {
 }
 
 function rejoindreSalon() {
-    socket.emit('rejoindreSalon', titre,isAdmin);
-}
-
-async function getWordsList() {
-    return await $.get({
-        url: "/partie/getWordList"
-    });
+    socket.emit('rejoindreSalon', titre, isAdmin);
 }
 
 /* FONCTIONS DU JEU */
@@ -34,12 +28,12 @@ function changerDeMot(word) {
 $("#typing-bar").keypress(function (e) {
     if (e.keyCode === 13) {
         //TODO VALIDATION DU MOT COTE SERVEUR
-        socket.emit('saisieMot',titre,$(this).val());
+        socket.emit('saisieMot', titre, $(this).val());
     }
 })
 
-socket.on('resetSaisie',()=>{
-   $("#typing-bar").val("");
+socket.on('resetSaisie', () => {
+    $("#typing-bar").val("");
 });
 
 socket.on('nouveauMot', word => {
@@ -48,8 +42,9 @@ socket.on('nouveauMot', word => {
 });
 
 
-socket.on('premierMot', ()=>{
-   socket.emit('demanderMot',titre,0);
+socket.on('premierMot', () => {
+    startChrono(true);
+    socket.emit('demanderMot', titre, 0);
 });
 
 socket.on('afficherMot', word => {
@@ -95,12 +90,28 @@ function stopChrono() {
 }
 
 
-socket.on('afficherJoueurs', (players) => {
-    $players = $(".player-list");
+socket.on('afficherJoueurs', (players, progression) => {
+    let $players = $(".player-list");
     $players.empty();
     $players.append("<li>Joueurs dans le salon :</li>")
     for (let i = 0; i < players.length; i++) {
-        $players.append("<li>" + players[i] + "</li>")
+        $players.append("<li>" + players[i] + "<strong class='" + players[i] + "'></strong></li>")
+    }
+    if(progression != null){
+        let scores = [];
+        progression.forEach(elem => {
+            scores[elem.name]  = {
+                score: 0,
+                name: elem.name
+            };
+        });
+        progression.forEach(elem => {
+            scores[elem.name].score++;
+        });
+
+       players.forEach(player => {
+           $("." + player).text(" " + scores[player].score + "/" + MAXWORDS)
+       })
     }
 
 })

@@ -80,8 +80,11 @@ module.exports = {
                         start: null,
                         gameStarted: false,
                         wordList: [],
-                        scores: []
+                        scores: [],
+                        maxwords: 10,
+                        progression: []
                     }
+
                 } else {
                     let room = rooms[titre];
                     socket.join(titre);
@@ -89,6 +92,7 @@ module.exports = {
                     socket.isAdmin = isAdmin;
                     if (!room.players.includes(socket.pseudo)) {
                         room.players.push(socket.pseudo);
+
                     }
                 }
                 io.to(titre).emit('afficherJoueurs', rooms[titre].players);
@@ -101,7 +105,7 @@ module.exports = {
                     room.start = new Date();
                     room.wordList = wordList;
 
-                    for (let i =0; i < room.players.length; i++){
+                    for (let i = 0; i < room.players.length; i++) {
                         room.scores[room.players[i]] = [];
                     }
 
@@ -109,22 +113,22 @@ module.exports = {
                 });
             });
 
-            socket.on('demanderMot',(salon,index) => {
+            socket.on('demanderMot', (salon, index) => {
                 let room = rooms[salon];
                 let word;
-                if (index === 0){
+                if (index === 0) {
                     word = room.wordList[index].Word;
-                }
-                else
+                } else
                     word = room.wordList[room.scores[socket.pseudo].length].word;
 
                 room.scores[socket.pseudo].push({
-                   word: word,
-                   givenAt: new Date(),
-                   completedAt: null
+                    word: word,
+                    givenAt: new Date(),
+                    completedAt: null
                 });
 
-                socket.emit('afficherMot',word);
+                socket.emit('afficherMot', word);
+
             });
 
             socket.on('saisieMot', function (salon, saisieJoueur) {
@@ -133,25 +137,34 @@ module.exports = {
                 let currentWord = room.wordList[scoreDuJoueur.length - 1].Word;
 
                 if (currentWord.toLowerCase() === saisieJoueur.toLowerCase()) {
-                    scoreDuJoueur[scoreDuJoueur.length -1].completedAt = new Date();
+                    scoreDuJoueur[scoreDuJoueur.length - 1].completedAt = new Date();
                     console.log(scoreDuJoueur);
 
+                    room.progression.push({
+                        name: socket.pseudo,
+                        word: currentWord
+                    })
+                    socket.emit('afficherJoueurs', room.players, room.progression)
+
                     //On ajoute le mot suivant
-                    let nextWord = room.wordList[scoreDuJoueur.length].Word;
-                    room.scores[socket.pseudo].push({
-                        word: nextWord,
-                        givenAt: new Date(),
-                        completedAt: null
-                    });
-                    socket.emit('afficherMot',nextWord);
+                    if (scoreDuJoueur.length < room.maxwords) {
+                        let nextWord = room.wordList[scoreDuJoueur.length].Word;
+                        room.scores[socket.pseudo].push({
+                            word: nextWord,
+                            givenAt: new Date(),
+                            completedAt: null
+                        });
+
+                        socket.emit('afficherMot', nextWord);
+                    } else {
+
+                    }
                     socket.emit('resetSaisie');
                 } else {
                     console.log("Saisie erronnée")
                     socket.emit('resetSaisie');
                 }
-
-
-            })
+            });
 
             socket.on('disconnect', function (reason) {
                 let titre = socket.salon;
