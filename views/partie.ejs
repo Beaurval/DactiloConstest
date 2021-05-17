@@ -1,8 +1,8 @@
 <%- include('header'); -%>
 
-<h1><%= title %></h1>
 <style>
     #wrapper {
+        font-family: 'Balsamiq Sans', cursive;
         display: grid;
         grid-gap: 10px;
         grid-template-areas: "t t ti"
@@ -92,10 +92,11 @@
         <ul class="player-list">
             <li>Joueurs dans le salon :</li>
         </ul>
-        <%
-        if(isAdmin == "true"){ %>
-            <button id="startGame" onclick="commencerPartie(this)" class="btn btn-outline-info mb-1">Commencer la partie</button>
-        <% } %>
+
+        <button style="display: none" id="startGame" onclick="commencerPartie(this)" class="btn btn-outline-info mb-1">
+            Commencer la partie
+        </button>
+
     </div>
     <div class="game">
         EN ATTENTE DES AUTRES JOUEURS ...

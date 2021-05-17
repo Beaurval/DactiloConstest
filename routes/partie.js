@@ -7,7 +7,8 @@ var db = null;
 let rooms = [];
 
 
-MongoClient.connect("mongodb://localhost:27017", {useUnifiedTopology: true}, function (err, client) {
+MongoClient.connect("mongodb://192.168.32.131:27017", {useUnifiedTopology: true}, function (err, client) {
+    console.log(err)
     db = client.db("dactilocontest");
 });
 
@@ -57,7 +58,7 @@ async function getWordList() {
 
 /* GET home page. */
 router.get('/', function (req, res) {
-    res.render('partie', {title: 'Dactilo Contest', isAdmin: req.query.isAdmin});
+    res.render('partie', {title: 'Dactilo Contest'});
 });
 
 
@@ -75,10 +76,13 @@ module.exports = {
                 socket.pseudo = pseudo;
             })
 
-            socket.on('rejoindreSalon', function (titre, isAdmin) {
+            socket.on('rejoindreSalon', function (titre) {
                 if (rooms[titre] == null) {
                     socket.join(titre);
-                    socket.isAdmin = !!isAdmin;
+                    socket.isAdmin = true;
+
+                    socket.emit('setAdmin');
+
 
                     rooms[titre] = {
                         name: titre,
@@ -96,7 +100,7 @@ module.exports = {
                     let room = rooms[titre];
                     socket.join(titre);
                     socket.salon = titre;
-                    socket.isAdmin = isAdmin;
+                    socket.isAdmin = false;
                     if (!room.players.includes(socket.pseudo)) {
                         room.players.push(socket.pseudo);
 

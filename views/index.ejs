@@ -1,64 +1,58 @@
 <%- include('header'); -%>
-<div class="container">
-    <h1><%= title %></h1>
-
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="home-tab" data-bs-toggle="tab" href="#rejoindre"
-               role="tab" aria-controls="rejoindre" aria-selected="true">
-                Rejoindre un salon
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#creation"
-               role="tab" aria-controls="creation" aria-selected="false">
-                Créer un salon
-            </a>
-        </li>
-    </ul>
-
-
-    <div class="tab-content">
-        <div class="tab-pane active" id="rejoindre" role="tabpanel" aria-labelledby="home-tab">
-            <h3 class="my-3">Liste des salons disponibles</h3>
-            <ul class="list-group">
-                <% for(let i = 0; i < rooms.length; i++){ %>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <%= rooms[i].titre %>
-                        <span class="badge bg-primary rounded-pill"><%= rooms.length %></span>
-                    </li>
-                <% } %>
-            </ul>
+<style>
+    .wrapper{
+        font-family: 'Balsamiq Sans', cursive;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 80vh;
+    }
+    .wrapper .titre {
+        font-size: 6em;
+        color: white;
+        text-shadow: 1px 1px 1px black;
+    }
+    .wrapper div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .wrapper label{
+        color: white;
+    }
+    .wrapper div input{
+        width: 300px;
+        height: 40px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .wrapper div input[type=submit]{
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        border: 0;
+    }
+</style>
+<form action="/partie">
+    <div class="wrapper" >
+        <h1 class="titre">Dactilo contest</h1>
+        <div>
+            <input name="pseudo" type="text" placeholder="VOTRE PSEUDO">
         </div>
-        <div class="tab-pane" id="creation" role="tabpanel" aria-labelledby="profile-tab">
-            <form action="/partie" method="get" class="mt-3">
-                <div class="mb-3">
-                    <label for="roomName" class="form-label">Titre</label>
-                    <input class="form-control" type="text" placeholder="Précisez le titre du salon" id="roomName"
-                           name="roomName">
-                </div>
-                <div class="mb-3">
-                    <label for="pseudo" class="form-label">Votre pseudo</label>
-                    <input class="form-control" type="text" placeholder="Votre nom visible par les autres joueurs"
-                           id="pseudo" name="pseudo">
-                </div>
-                <input type="hidden" name="isAdmin" value="true">
-                <div class="d-grid gap-2 col-6 mx-auto">
-                    <button  class="btn btn-success"
-                            onclick="ajouterSalon()">
-                        GO
-                    </button>
-                </div>
-            </form>
+
+        <div>
+            <input name="roomName" type="text" placeholder="NOM DU SALON">
+        </div>
+        <div>
+            <input type="submit" value="REJOINDRE">
         </div>
     </div>
-</div>
+</form>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/javascripts/index.js"></script>
-<script>
-    var socket = io.connect("localhost:3000");
-</script>
+
 
 <%- include('footer'); -%>

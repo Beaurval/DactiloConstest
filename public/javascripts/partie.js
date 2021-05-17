@@ -2,7 +2,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const MAXWORDS = 3;
 const pseudo = urlParams.get("pseudo");
 const titre = urlParams.get("roomName");
-const isAdmin = urlParams.get("isAdmin");
+let isAdmin =false;
 
 let nbMotsValides = 0;
 let chronoCanInc = false;
@@ -14,6 +14,11 @@ function definirPseudo() {
 function rejoindreSalon() {
     socket.emit('rejoindreSalon', titre, isAdmin);
 }
+
+socket.on('setAdmin',()=>{
+    isAdmin = true;
+    $("#startGame").show();
+})
 
 /* FONCTIONS DU JEU */
 async function commencerPartie(btn) {
@@ -112,7 +117,7 @@ socket.on('afficherProgression',(players,progression) => {
 socket.on('partieTerminee',(winner,lastWords)=> {
     let $partieContainer = $(".game");
     $partieContainer.html(
-        "<span>" + winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s" + "</span>"
+        "<span style='font-size: 0.9em;'>" + winner.pseudo + " a gagné la partie avec un temps de " + winner.totalTime + "s" + "</span>"
     );
     lastWords.sort((a,b)=>{
         if (a.totalTime < b.totalTime) { return -1; }

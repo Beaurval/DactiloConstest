@@ -4,7 +4,7 @@ var router = app.Router();
 var MongoClient = require("mongodb").MongoClient;
 var db = null;
 
-MongoClient.connect("mongodb://localhost:27017", {useUnifiedTopology: true}, function (err, client) {
+MongoClient.connect("mongodb://192.168.32.131:27017",{useUnifiedTopology: true}, function (err, client) {
     console.log("Connected successfully to server");
     db = client.db("dactilocontest");
 });
